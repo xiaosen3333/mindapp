@@ -272,7 +272,7 @@ function Page5(props: { handlenext: () => void }) {
   };
   const respondHoodle = (respond: string) => {
     result = respond;
-    loadingRef.current.innerText = result;
+    // loadingRef.current.innerText = result;
     console.log("respond", result);
     // loadingRef.current
   };
