@@ -13,13 +13,16 @@ interface CropperRef {
 }
 
 const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
-  { isText, respondHoodle, loadHoodle, errorHoodle },
+  { isText, respondHoodle, errorHoodle },
   ref
 ) {
   let result: string = "";
   const [historyMessage, setHistoryMessage] = useState<any[]>([
-    { role: "user", content: "你是谁" }, //# 用户的历史问题
-    { role: "assistant", content: "我是AI助手" },
+    {
+      role: "system",
+      content:
+        "作为服务老人的大学生志愿者，我的任务是倾听他们讲述生活中的事情，并基于他们的描述提出五个递进式的问题，以更深入地了解事件。我会尊重老人，用礼貌的语言提问，每次提问不超过10个字，确保问题递进且不偏离主题。在老人讲述完一件事情后，我会依次提出两个问题，老人也会依次回答。",
+    },
   ]);
 
   useImperativeHandle(ref, () => ({
@@ -36,7 +39,6 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
     socket.addEventListener("open", (event) => {
       console.log(event);
 
-      if (loadHoodle) loadHoodle(true);
       // 发送消息
       let params = {
         header: {
@@ -57,7 +59,7 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
             text: [
               ...historyMessage,
               // ....... 省略的历史对话
-              { role: "user", content: "你好" }, //# 最新的一条问题，如无需上下文，可只传最新一条问题
+              { role: "user", content: questionText }, //# 最新的一条问题，如无需上下文，可只传最新一条问题
             ],
           },
         },
@@ -73,7 +75,6 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
         return;
       }
       result += data.payload.choices.text[0].content;
-      respondHoodle(result);
       if (data.header.code !== 0) {
         console.log("出错了", data.header.code, ":", data.header.message);
         // 出错了"手动关闭连接"
@@ -91,13 +92,7 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
     });
     socket.addEventListener("close", (event) => {
       console.log(event);
-
-      setHistoryMessage([
-        ...historyMessage,
-        { role: "user", content: questionText },
-        { role: "assistant", content: result },
-      ]);
-      if (loadHoodle) loadHoodle(false);
+      respondHoodle(result);
       // 对话完成后socket会关闭，将聊天记录换行处理
     });
     socket.addEventListener("error", (event) => {

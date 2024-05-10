@@ -236,7 +236,6 @@ function Page5(props: { handlenext: () => void }) {
   const handleInputChange = (e: any) => {
     setValue(e.target.value); // 更新 value 的状态
   };
-  const [question, setQuestion] = useState<string>("");
   // const [result, setResult] = useState<string>('');
   let result = "";
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -245,29 +244,9 @@ function Page5(props: { handlenext: () => void }) {
   const messageContainerRef = useRef<any>(null);
   const loadingRef = useRef<any>(null);
   const submit = () => {
-    setQuestion("");
-    console.log(messageList);
-    if (!messageList.length) {
-      setMessageList([
-        {
-          user: true,
-          text: question,
-        },
-      ]);
-      console.log(messageList);
-    } else {
-      setMessageList([
-        ...messageList,
-        {
-          user: true,
-          text: question,
-        },
-      ]);
-      console.log(messageList);
-    }
     if (ref.current) {
       console.log("yes");
-      ref.current.submitHoodle("你好");
+      ref.current.submitHoodle(value);
     }
   };
   const respondHoodle = (respond: string) => {
@@ -275,16 +254,6 @@ function Page5(props: { handlenext: () => void }) {
     // loadingRef.current.innerText = result;
     console.log("respond", result);
     // loadingRef.current
-  };
-  const overRespond = (v: boolean) => {
-    if (!v) {
-      setMessageList((prevList) => [
-        ...prevList,
-        { user: false, text: result },
-      ]);
-      console.log(messageList);
-    }
-    setIsLoading(v);
   };
 
   if (!browserSupportsSpeechRecognition) {
@@ -296,7 +265,6 @@ function Page5(props: { handlenext: () => void }) {
       question: recordcontext[recordcontext.length - 1].event,
       answer: value,
     });
-    await setQuestion(value);
     submit();
     //TODO 调用语言模型，传入问题和答案，继续提问，跳入下一页面
 
@@ -337,11 +305,7 @@ function Page5(props: { handlenext: () => void }) {
         />
         <img className={styles.nextbtn} src={next} alt="" onClick={handleok} />
       </div>
-      <AiTool
-        loadHoodle={overRespond}
-        respondHoodle={respondHoodle}
-        ref={ref}
-      />
+      <AiTool respondHoodle={respondHoodle} ref={ref} />
     </Card>
   );
 }
