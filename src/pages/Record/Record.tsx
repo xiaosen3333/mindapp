@@ -6,10 +6,17 @@ import styles from "./Record.module.scss";
 import next from "../../icon/next.svg";
 import camera from "../../icon/camera.svg";
 import back from "../../icon/back.svg";
-import { PageContext, RecordContext } from "../../context/MyContext";
+import {
+  PageContext,
+  ProgressContext,
+  RecordContext,
+} from "../../context/MyContext";
 import backbtn from "../../icon/backbtn.svg";
 import voice from "../../icon/voice.svg";
 import compelete from "../../icon/compelete.svg";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 export const RecordPage = (props: { pagenum: number }) => {
   const [page, setPage] = useState<number>(props.pagenum);
@@ -210,14 +217,40 @@ function Page4(props: { handlenext: () => void }) {
 
 function Page5(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
+  const [tempValue, setTempValue] = useState("");
   const [value, setValue] = useState("");
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
   const handleInputChange = (e: any) => {
     setValue(e.target.value); // 更新 value 的状态
     console.log(e.target.value); // 可选：控制台输出当前的输入值
   };
-  const handleVoiceInput = () => {
-    //TODO 接麦克风和实时转写
-  };
+  // useEffect(() => {
+  //   if (listening) {
+  //     setTempValue(value);
+  //   }
+  // }, [listening, value]);
+  // useEffect(() => {
+  //   if (listening) {
+  //     setTempValue((prevTempValue) => prevTempValue + transcript);
+  //   }
+  // }, [transcript, listening]);
+
+  // // 当停止语音输入时，将tempValue更新回value
+  // useEffect(() => {
+  //   if (!listening && tempValue !== "") {
+  //     setValue(tempValue);
+  //     setTempValue(""); // 清空暂存值
+  //   }
+  // }, [listening, tempValue, setValue]);
+  if (!browserSupportsSpeechRecognition) {
+    console.log("!");
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
   const handleok = () => {
     recordcontext[recordcontext.length - 1].descriptions.push({
       question:
@@ -243,7 +276,22 @@ function Page5(props: { handlenext: () => void }) {
       </div>
       <div className={styles.btngroup}>
         <div className={styles.imgempty}></div>
-        <img src={voice} alt="" onClick={handleVoiceInput} />
+        <img
+          src={voice}
+          alt=""
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}
+          onTouchStart={(e) => {
+            SpeechRecognition.startListening();
+            console.log("!");
+          }}
+          onTouchEnd={() => {
+            SpeechRecognition.stopListening();
+            setValue(value + transcript);
+            console.log("!!");
+          }}
+        />
         <img className={styles.nextbtn} src={next} alt="" onClick={handleok} />
       </div>
     </Card>
@@ -313,10 +361,11 @@ function Page7(props: { handlenext: () => void }) {
 function Page8(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
   const { pagenum, setPagenum } = useContext(PageContext);
-
+  const { progress, setProgress } = useContext(ProgressContext);
   useEffect(() => {
     const timer = setTimeout(() => {
       setPagenum(1);
+      setProgress(25);
     }, 1100);
     return () => clearTimeout(timer);
   });

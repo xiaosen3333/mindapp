@@ -6,7 +6,11 @@ import styles from "./Data.module.scss";
 import next from "../../icon/next.svg";
 import camera from "../../icon/camera.svg";
 import back from "../../icon/back.svg";
-import { PageContext, RecordContext } from "../../context/MyContext";
+import {
+  PageContext,
+  ProgressContext,
+  RecordContext,
+} from "../../context/MyContext";
 import backbtn from "../../icon/backbtn.svg";
 import voice from "../../icon/voice.svg";
 import compelete from "../../icon/compelete.svg";
@@ -241,11 +245,13 @@ function Page7(props: { handlenext: () => void }) {
 function Page8(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
   const { pagenum, setPagenum } = useContext(PageContext);
+  const { progress, setProgress } = useContext(ProgressContext);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       // setPagenum(0);
-    }, 1100);
+      setProgress(100);
+    }, 0);
     return () => clearTimeout(timer);
   });
   useEffect(() => {

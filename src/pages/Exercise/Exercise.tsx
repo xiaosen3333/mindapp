@@ -8,7 +8,11 @@ import next1 from "../../icon/next.svg";
 
 import camera from "../../icon/camera.svg";
 import back from "../../icon/back.svg";
-import { PageContext, RecordContext } from "../../context/MyContext";
+import {
+  PageContext,
+  ProgressContext,
+  RecordContext,
+} from "../../context/MyContext";
 import backbtn from "../../icon/backbtn.svg";
 import voice from "../../icon/voice.svg";
 import compelete from "../../icon/compelete.svg";
@@ -122,22 +126,7 @@ function Page2(props: { handleback: () => void; handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
   return (
     <Card>
-      <div className={styles.title}>
-        这是你昨天
-        <br />
-        记录的照片
-      </div>
-      <img
-        src={recordcontext[recordcontext.length - 1].img}
-        alt=""
-        className={styles.photo}
-      />
-      <img
-        className={styles.nextbtn}
-        src={next}
-        alt=""
-        onClick={() => props.handlenext()}
-      />
+      <div></div>
     </Card>
   );
 }
@@ -274,10 +263,12 @@ function Page7(props: { handlenext: () => void }) {
 function Page8(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
   const { pagenum, setPagenum } = useContext(PageContext);
+  const { progress, setProgress } = useContext(ProgressContext);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setPagenum(3);
+      setProgress(75);
     }, 1100);
     return () => clearTimeout(timer);
   });

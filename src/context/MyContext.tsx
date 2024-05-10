@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 
-const progress: number = 10;
+const progress: number = 0;
 
-export const ProgressContext = React.createContext<{ progress: number }>({
+export const ProgressContext = React.createContext<{
+  progress: number;
+  setProgress: React.Dispatch<React.SetStateAction<number>>;
+}>({
   progress,
+  setProgress: () => {},
 });
 interface PageContextType {
   pagenum: number;
