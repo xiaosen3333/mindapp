@@ -34,6 +34,8 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
     let socket = new WebSocket(myUrl);
     // 监听websocket的各阶段事件 并做相应处理
     socket.addEventListener("open", (event) => {
+      console.log(event);
+
       if (loadHoodle) loadHoodle(true);
       // 发送消息
       let params = {
@@ -43,7 +45,7 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
         },
         parameter: {
           chat: {
-            domain: "general",
+            domain: "generalv3.5",
             temperature: 0.5,
             max_tokens: 1024,
           },
@@ -55,7 +57,7 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
             text: [
               ...historyMessage,
               // ....... 省略的历史对话
-              { role: "user", content: questionText }, //# 最新的一条问题，如无需上下文，可只传最新一条问题
+              { role: "user", content: "你好" }, //# 最新的一条问题，如无需上下文，可只传最新一条问题
             ],
           },
         },
@@ -64,6 +66,8 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
     });
     socket.addEventListener("message", (event) => {
       let data = JSON.parse(event.data);
+      console.log(event);
+      console.log(data);
       if (!data.payload) {
         socket.close();
         return;
@@ -86,6 +90,8 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
       }
     });
     socket.addEventListener("close", (event) => {
+      console.log(event);
+
       setHistoryMessage([
         ...historyMessage,
         { role: "user", content: questionText },

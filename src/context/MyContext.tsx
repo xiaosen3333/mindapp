@@ -22,6 +22,7 @@ export const PageContext = React.createContext<PageContextType>({
 
 const record: {
   img: string;
+  event: string;
   date: string;
   descriptions: {
     question: string;
@@ -30,6 +31,7 @@ const record: {
   conslusion: string;
 }[] = [
   {
+    event: "",
     img: "",
     date: "",
     descriptions: [{ question: "记录下你今天最喜欢的一道菜", answer: "" }],

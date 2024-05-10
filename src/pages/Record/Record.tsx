@@ -17,7 +17,15 @@ import compelete from "../../icon/compelete.svg";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
-
+import AiTool from "../../server/AiTool";
+interface IProps {
+  datas?: any[];
+}
+//user：true代表用户信息，反之ai
+interface messageInfo {
+  text: string;
+  user: boolean;
+}
 export const RecordPage = (props: { pagenum: number }) => {
   const [page, setPage] = useState<number>(props.pagenum);
   switch (page) {
@@ -227,38 +235,73 @@ function Page5(props: { handlenext: () => void }) {
   } = useSpeechRecognition();
   const handleInputChange = (e: any) => {
     setValue(e.target.value); // 更新 value 的状态
-    console.log(e.target.value); // 可选：控制台输出当前的输入值
   };
-  // useEffect(() => {
-  //   if (listening) {
-  //     setTempValue(value);
-  //   }
-  // }, [listening, value]);
-  // useEffect(() => {
-  //   if (listening) {
-  //     setTempValue((prevTempValue) => prevTempValue + transcript);
-  //   }
-  // }, [transcript, listening]);
+  const [question, setQuestion] = useState<string>("");
+  // const [result, setResult] = useState<string>('');
+  let result = "";
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [messageList, setMessageList] = useState<messageInfo[]>([]);
+  const ref = useRef<any>(null);
+  const messageContainerRef = useRef<any>(null);
+  const loadingRef = useRef<any>(null);
+  const submit = () => {
+    setQuestion("");
+    console.log(messageList);
+    if (!messageList.length) {
+      setMessageList([
+        {
+          user: true,
+          text: question,
+        },
+      ]);
+      console.log(messageList);
+    } else {
+      setMessageList([
+        ...messageList,
+        {
+          user: true,
+          text: question,
+        },
+      ]);
+      console.log(messageList);
+    }
+    if (ref.current) {
+      console.log("yes");
+      ref.current.submitHoodle("你好");
+    }
+  };
+  const respondHoodle = (respond: string) => {
+    result = respond;
+    loadingRef.current.innerText = result;
+    console.log("respond", result);
+    // loadingRef.current
+  };
+  const overRespond = (v: boolean) => {
+    if (!v) {
+      setMessageList((prevList) => [
+        ...prevList,
+        { user: false, text: result },
+      ]);
+      console.log(messageList);
+    }
+    setIsLoading(v);
+  };
 
-  // // 当停止语音输入时，将tempValue更新回value
-  // useEffect(() => {
-  //   if (!listening && tempValue !== "") {
-  //     setValue(tempValue);
-  //     setTempValue(""); // 清空暂存值
-  //   }
-  // }, [listening, tempValue, setValue]);
   if (!browserSupportsSpeechRecognition) {
     console.log("!");
     return <span>Browser doesn't support speech recognition.</span>;
   }
-  const handleok = () => {
+  async function handleok() {
     recordcontext[recordcontext.length - 1].descriptions.push({
-      question:
-        recordcontext[recordcontext.length - 1].descriptions[0].question,
+      question: recordcontext[recordcontext.length - 1].event,
       answer: value,
     });
-    props.handlenext();
-  };
+    await setQuestion(value);
+    submit();
+    //TODO 调用语言模型，传入问题和答案，继续提问，跳入下一页面
+
+    // props.handlenext();
+  }
   return (
     <Card>
       <img
@@ -294,6 +337,11 @@ function Page5(props: { handlenext: () => void }) {
         />
         <img className={styles.nextbtn} src={next} alt="" onClick={handleok} />
       </div>
+      <AiTool
+        loadHoodle={overRespond}
+        respondHoodle={respondHoodle}
+        ref={ref}
+      />
     </Card>
   );
 }
@@ -304,7 +352,6 @@ function Page6(props: { handlenext: () => void }) {
   const [question, setQuestion] = useState("");
   const handleInputChange = (e: any) => {
     setValue(e.target.value); // 更新 value 的状态
-    console.log(e.target.value); // 可选：控制台输出当前的输入值
   };
   const handleVoiceInput = () => {
     //TODO 接麦克风和实时转写
