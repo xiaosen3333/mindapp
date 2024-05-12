@@ -18,6 +18,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import AiTool from "../../server/AiTool";
+import AiTool2 from "../../server/AiTool2";
 interface IProps {
   datas?: any[];
 }
@@ -136,13 +137,26 @@ function Card({ children, isanimation = false }: CardProps) {
   );
 }
 function Page1(props: { handlenext: () => void }) {
+  const recordcontext = useContext(RecordContext);
+  const [randomTitle, setRandomTitle] = useState("");
+  useEffect(() => {
+    // 提供的字符串数组
+    const titles = [
+      "记录下你今天最喜欢的一道菜",
+      "记录今天做的一件家务",
+      "记录今天看到的美景",
+      "与今天交流中带给你快乐的人合照",
+      "与今天一起散步的伙伴合照吧",
+      "记录一下今天让你快乐的事物吧",
+    ];
+
+    // 从数组中随机选择一个标题
+    setRandomTitle(titles[Math.floor(Math.random() * titles.length)]);
+    recordcontext[recordcontext.length - 1].event = randomTitle;
+  });
   return (
     <Card>
-      <div className={styles.title}>
-        记录下你今天
-        <br />
-        最喜欢的一道菜
-      </div>
+      <div className={styles.title}>{randomTitle}</div>
       <div className={styles.camera}>
         <img src={camera} alt="" onClick={() => props.handlenext()} />
       </div>
@@ -227,22 +241,13 @@ function Page5(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
   const [tempValue, setTempValue] = useState("");
   const [value, setValue] = useState("");
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-  } = useSpeechRecognition();
+  const { transcript, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
   const handleInputChange = (e: any) => {
     setValue(e.target.value); // 更新 value 的状态
   };
-  // const [result, setResult] = useState<string>('');
   let result = "";
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [messageList, setMessageList] = useState<messageInfo[]>([]);
   const ref = useRef<any>(null);
-  const messageContainerRef = useRef<any>(null);
-  const loadingRef = useRef<any>(null);
   const submit = () => {
     if (ref.current) {
       console.log("yes");
@@ -250,9 +255,28 @@ function Page5(props: { handlenext: () => void }) {
     }
   };
   const respondHoodle = (respond: string) => {
-    result = respond;
+    result = respond.trim();
     // loadingRef.current.innerText = result;
-    console.log("respond", result);
+    const questions: string[] = result.split("\n");
+    // 创建一个正则表达式，用来匹配数字序号和问号
+
+    // 遍历数组中的每个字符串，去除开头的两个字符和结尾的一个字符
+    const cleanedQuestions: string[] = questions.map((question) => {
+      return question.substring(3, question.length - 1);
+    });
+
+    console.log(cleanedQuestions);
+
+    recordcontext[recordcontext.length - 1].descriptions.push({
+      question: cleanedQuestions[0],
+      answer: "",
+    });
+    recordcontext[recordcontext.length - 1].descriptions.push({
+      question: cleanedQuestions[1],
+      answer: "",
+    });
+    console.log(recordcontext);
+    props.handlenext();
     // loadingRef.current
   };
 
@@ -261,14 +285,7 @@ function Page5(props: { handlenext: () => void }) {
     return <span>Browser doesn't support speech recognition.</span>;
   }
   async function handleok() {
-    recordcontext[recordcontext.length - 1].descriptions.push({
-      question: recordcontext[recordcontext.length - 1].event,
-      answer: value,
-    });
     submit();
-    //TODO 调用语言模型，传入问题和答案，继续提问，跳入下一页面
-
-    // props.handlenext();
   }
   return (
     <Card>
@@ -313,18 +330,66 @@ function Page5(props: { handlenext: () => void }) {
 function Page6(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
   const [value, setValue] = useState("");
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useState(
+    recordcontext[recordcontext.length - 1].descriptions[0].question
+  );
+  const [index, setIndex] = useState(0);
+  const { transcript, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+  const ref = useRef<any>(null);
+
   const handleInputChange = (e: any) => {
     setValue(e.target.value); // 更新 value 的状态
   };
-  const handleVoiceInput = () => {
-    //TODO 接麦克风和实时转写
-  };
+  if (!browserSupportsSpeechRecognition) {
+    console.log("!");
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
   const handleok = () => {
-    recordcontext[recordcontext.length - 1].descriptions.push({
-      question: question,
-      answer: value,
-    });
+    if (recordcontext[recordcontext.length - 1].descriptions.length === index) {
+      submit();
+      return;
+    }
+    recordcontext[recordcontext.length - 1].descriptions[index].answer = value;
+    setIndex(index + 1);
+    if (
+      recordcontext[recordcontext.length - 1].descriptions.length >
+      index + 1
+    ) {
+      setQuestion(
+        recordcontext[recordcontext.length - 1].descriptions[index + 1].question
+      );
+      setValue("");
+    } else {
+      submit();
+      console.log(recordcontext);
+    }
+  };
+
+  let result = "";
+  const submit = () => {
+    let descriptions = recordcontext[recordcontext.length - 1].descriptions;
+
+    // 使用map来提取问题和答案，然后join它们成为一个字符串
+    let descriptionsString = descriptions
+      .map((item) => `${item.question}:${item.answer}`)
+      .join("\n");
+
+    console.log(descriptionsString);
+    if (ref.current) {
+      console.log("yes");
+
+      ref.current.submitHoodle(descriptionsString);
+    }
+  };
+  const respondHoodle = (respond: string) => {
+    result = respond.trim();
+    console.log(result);
+    if (result.charAt(result.length - 1) === ".") {
+      // 去掉最后一个字符（句号）
+      result = result.slice(0, -1);
+    }
+    recordcontext[recordcontext.length - 1].conslusion = result;
     props.handlenext();
   };
   return (
@@ -342,15 +407,30 @@ function Page6(props: { handlenext: () => void }) {
       </div>
       <div className={styles.btngroup}>
         <div className={styles.imgempty}></div>
-        <img src={voice} alt="" onClick={handleVoiceInput} />
+        <img
+          src={voice}
+          alt=""
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}
+          onTouchStart={(e) => {
+            SpeechRecognition.startListening();
+          }}
+          onTouchEnd={() => {
+            SpeechRecognition.stopListening();
+            setValue(value + transcript);
+          }}
+        />
         <img className={styles.nextbtn} src={next} alt="" onClick={handleok} />
       </div>
+      <AiTool2 respondHoodle={respondHoodle} ref={ref} />
     </Card>
   );
 }
 
 function Page7(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
+
   return (
     <Card>
       <div className={styles.title}>

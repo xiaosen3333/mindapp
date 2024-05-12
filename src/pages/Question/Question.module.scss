@@ -49,6 +49,7 @@
   height: 261px;
   // border: 1px solid rgb(240, 240, 240);
   box-sizing: border-box;
+  object-fit: cover;
 }
 
 .foot {
@@ -80,8 +81,10 @@
   width: 174px;
   height: 174px;
   box-sizing: border-box;
-  border: 2px solid rgb(255, 200, 205);
+  border: 2px solid rgb(168, 238, 204);
   border-radius: 21px;
+  object-fit: cover;
+
   box-shadow: 1px 2px 1.2px 0px rgba(0, 0, 0, 0.25);
 }
 

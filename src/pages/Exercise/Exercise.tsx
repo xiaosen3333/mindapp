@@ -1,22 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRef } from "react";
-import Camera from "../../components/Camera";
-import Microphone from "../../components/Microphone";
 import styles from "./Exercise.module.scss";
 import next from "../../icon/next2.svg";
 import next1 from "../../icon/next.svg";
-
-import camera from "../../icon/camera.svg";
-import back from "../../icon/back.svg";
-import {
-  PageContext,
-  ProgressContext,
-  RecordContext,
-} from "../../context/MyContext";
-import backbtn from "../../icon/backbtn.svg";
-import voice from "../../icon/voice.svg";
+import { PageContext, ProgressContext } from "../../context/MyContext";
 import compelete from "../../icon/compelete.svg";
-
+import { random } from "lodash";
 export const ExercisePage = (props: { pagenum: number }) => {
   const [page, setPage] = useState<number>(props.pagenum);
   switch (page) {
@@ -121,18 +110,65 @@ function Page1(props: { handlenext: () => void }) {
     </Card>
   );
 }
+type Circle = {
+  id: number;
+  x: number;
+  y: number;
+  opacity: number;
+};
 
 function Page2(props: { handleback: () => void; handlenext: () => void }) {
-  const recordcontext = useContext(RecordContext);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [circles, setCircles] = useState<Circle[]>([]);
+  useEffect(() => {
+    // 创建一个计时器
+    const timer = setInterval(() => {
+      setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
+    }, 1000);
+
+    // 当时间到达0时，清除计时器
+    if (timeLeft === 0) {
+      clearInterval(timer);
+    }
+
+    // 组件卸载时清除计时器
+    return () => clearInterval(timer);
+  }, [timeLeft]); // 依赖项为timeLeft，当timeLeft变化时，effect会重新运行
+
   return (
     <Card>
-      <div></div>
+      <div className={styles.title}>
+        {timeLeft > 0 ? `00:${timeLeft}` : "时间到!"}
+      </div>
+      <div
+        style={{
+          position: "relative",
+          width: "80%",
+          height: "300px", // 设置一个区域的高度
+          border: "1px solid black",
+        }}
+      >
+        {circles.map((circle) => (
+          <div
+            key={circle.id}
+            style={{
+              position: "absolute",
+              left: `${circle.x}%`,
+              top: `${circle.y}%`,
+              width: "50px",
+              height: "50px",
+              borderRadius: "50%",
+              backgroundColor: "blue",
+              opacity: circle.opacity,
+            }}
+          />
+        ))}
+      </div>
     </Card>
   );
 }
 
 function Page3(props: { handlenext: () => void; handleback: () => void }) {
-  const recordcontext = useContext(RecordContext);
   return (
     <Card>
       <div className={styles.title}>00:00</div>
@@ -156,90 +192,7 @@ function Page3(props: { handlenext: () => void; handleback: () => void }) {
   );
 }
 
-function Page4(props: { handlenext: () => void }) {
-  const recordcontext = useContext(RecordContext);
-  const [value, setValue] = useState("");
-  const handleInputChange = (e: any) => {
-    setValue(e.target.value); // 更新 value 的状态
-    console.log(e.target.value); // 可选：控制台输出当前的输入值
-  };
-  const handleVoiceInput = () => {
-    //TODO 接麦克风和实时转写
-  };
-  const handleok = () => {
-    recordcontext[recordcontext.length - 1].descriptions.push({
-      question:
-        recordcontext[recordcontext.length - 1].descriptions[0].question,
-      answer: value,
-    });
-    props.handlenext();
-  };
-  return (
-    <Card>
-      <img
-        className={styles.smallphoto}
-        src={recordcontext[recordcontext.length - 1].img}
-        alt=""
-      ></img>
-      <div className={styles.inputcard}>
-        <textarea
-          name=""
-          id=""
-          value={value} // 确保将 value 设置为 textarea 的值
-          onChange={handleInputChange}
-        ></textarea>
-      </div>
-      <div className={styles.btngroup}>
-        <div className={styles.imgempty}></div>
-        <img src={voice} alt="" onClick={handleVoiceInput} />
-        <img className={styles.nextbtn} src={next} alt="" onClick={handleok} />
-      </div>
-    </Card>
-  );
-}
-
-function Page5(props: { handlenext: () => void }) {
-  const recordcontext = useContext(RecordContext);
-  const [value, setValue] = useState("");
-  const [question, setQuestion] = useState("");
-  const handleInputChange = (e: any) => {
-    setValue(e.target.value); // 更新 value 的状态
-    console.log(e.target.value); // 可选：控制台输出当前的输入值
-  };
-  const handleVoiceInput = () => {
-    //TODO 接麦克风和实时转写
-  };
-  const handleok = () => {
-    recordcontext[recordcontext.length - 1].descriptions.push({
-      question: question,
-      answer: value,
-    });
-    props.handlenext();
-  };
-  return (
-    <Card>
-      <div className={styles.title} style={{ height: 174 }}>
-        {question}
-      </div>
-      <div className={styles.inputcard}>
-        <textarea
-          name=""
-          id=""
-          value={value} // 确保将 value 设置为 textarea 的值
-          onChange={handleInputChange}
-        ></textarea>
-      </div>
-      <div className={styles.btngroup}>
-        <div className={styles.imgempty}></div>
-        <img src={voice} alt="" onClick={handleVoiceInput} />
-        <img className={styles.nextbtn} src={next} alt="" onClick={handleok} />
-      </div>
-    </Card>
-  );
-}
-
 function Page7(props: { handlenext: () => void }) {
-  const recordcontext = useContext(RecordContext);
   return (
     <Card>
       <div className={styles.title}>
@@ -261,7 +214,6 @@ function Page7(props: { handlenext: () => void }) {
 }
 
 function Page8(props: { handlenext: () => void }) {
-  const recordcontext = useContext(RecordContext);
   const { pagenum, setPagenum } = useContext(PageContext);
   const { progress, setProgress } = useContext(ProgressContext);
 

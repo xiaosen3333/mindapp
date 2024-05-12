@@ -12,7 +12,7 @@ interface CropperRef {
   submitHoodle: (v: any) => void; //父类调用
 }
 
-const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
+const AiTool3 = forwardRef<CropperRef, AiToolProps>(function AiTool(
   { isText, respondHoodle, errorHoodle },
   ref
 ) {
@@ -21,7 +21,7 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
     {
       role: "system",
       content:
-        "作为服务老人的大学生志愿者，我的任务是倾听他们讲述生活中的事情，并基于他们的描述提出两个递进式的问题，以更深入地了解事件。我会尊重老人，用礼貌的语言提问，每次提问不超过10个字，确保问题递进且不偏离主题。在老人讲述完一件事情后，我会依次提出两个问题，老人也会依次回答。",
+        "作为服务老人的大学生志愿者，我的任务是帮助老年人判断他的记忆是否准确，但要稍微宽容一些，我会给你标准答案和老人的回答。不需要解析，你的回答只能是'正确'或'错误'",
     },
   ]);
 
@@ -103,4 +103,4 @@ const AiTool = forwardRef<CropperRef, AiToolProps>(function AiTool(
   // return result;
   return <div></div>;
 });
-export default AiTool;
+export default AiTool3;

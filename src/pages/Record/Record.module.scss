@@ -6,6 +6,9 @@
   line-height: 45px;
   letter-spacing: 0%;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .camera {
   width: 233px;
@@ -47,7 +50,7 @@
 .photo {
   width: 261px;
   height: 261px;
-  border: 1px solid rgb(240, 240, 240);
+  // border: 1px solid rgb(240, 240, 240);
   box-sizing: border-box;
   object-fit: cover;
 }
