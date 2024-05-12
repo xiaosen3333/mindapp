@@ -1,17 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRef } from "react";
-import Camera from "../../components/Camera";
-import Microphone from "../../components/Microphone";
 import styles from "./Question.module.scss";
 import next from "../../icon/next.svg";
-import camera from "../../icon/camera.svg";
-import back from "../../icon/back.svg";
 import {
   PageContext,
   ProgressContext,
   RecordContext,
 } from "../../context/MyContext";
-import backbtn from "../../icon/backbtn.svg";
 import voice from "../../icon/voice.svg";
 import compelete from "../../icon/compelete.svg";
 import SpeechRecognition, {

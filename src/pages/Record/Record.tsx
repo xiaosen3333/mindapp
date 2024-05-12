@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRef } from "react";
 import Camera from "../../components/Camera";
-import Microphone from "../../components/Microphone";
 import styles from "./Record.module.scss";
 import next from "../../icon/next.svg";
 import camera from "../../icon/camera.svg";
@@ -19,14 +18,7 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import AiTool from "../../server/AiTool";
 import AiTool2 from "../../server/AiTool2";
-interface IProps {
-  datas?: any[];
-}
-//user：true代表用户信息，反之ai
-interface messageInfo {
-  text: string;
-  user: boolean;
-}
+
 export const RecordPage = (props: { pagenum: number }) => {
   const [page, setPage] = useState<number>(props.pagenum);
   switch (page) {

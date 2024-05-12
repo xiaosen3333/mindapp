@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useRef } from "react";
 import styles from "./Exercise.module.scss";
 import next from "../../icon/next2.svg";
 import next1 from "../../icon/next.svg";

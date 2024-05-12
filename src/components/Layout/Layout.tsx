@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Layout, theme, Image } from "antd";
+import { Layout } from "antd";
 import { PageContext, ProgressContext } from "../../context/MyContext";
 import { MyProgress } from "../Progress/Progress";
 import menu from "../../../src/icon/menu.svg";
@@ -8,16 +8,12 @@ import { RecordPage } from "../../pages/Record/Record";
 import { QuestionPage } from "../../pages/Question/Question";
 import { ExercisePage } from "../../pages/Exercise/Exercise";
 import { DataPage } from "../../pages/Data/Data";
-import Microphone from "../Microphone";
 import Dictaphone from "../Speech";
 const { Header, Content, Footer } = Layout;
 
 export const MyLayout: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [pagenum, setPagenum] = useState(0);
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
   useEffect(() => {
     console.log(pagenum);
     console.log(progress);
