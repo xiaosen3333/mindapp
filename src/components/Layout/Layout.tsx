@@ -14,7 +14,7 @@ const { Header, Content, Footer } = Layout;
 
 export const MyLayout: React.FC = () => {
   const [progress, setProgress] = useState(0);
-  const [pagenum, setPagenum] = useState(2);
+  const [pagenum, setPagenum] = useState(3);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -45,8 +45,8 @@ export const MyLayout: React.FC = () => {
           <Content style={{ padding: "0px 13px", backgroundColor: "#FCF5EB" }}>
             {pagenum === 0 && <RecordPage pagenum={0}></RecordPage>}
             {pagenum === 1 && <QuestionPage pagenum={0}></QuestionPage>}
-            {pagenum === 2 && <ExercisePage pagenum={1}></ExercisePage>}
-            {pagenum === 3 && <DataPage pagenum={5}></DataPage>}
+            {pagenum === 2 && <ExercisePage pagenum={0}></ExercisePage>}
+            {pagenum === 3 && <DataPage pagenum={6}></DataPage>}
             {pagenum === 4 && <Dictaphone />}
           </Content>
         </ProgressContext.Provider>

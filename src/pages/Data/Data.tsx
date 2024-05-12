@@ -1,20 +1,84 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRef } from "react";
-import Camera from "../../components/Camera";
-import Microphone from "../../components/Microphone";
+
 import styles from "./Data.module.scss";
 import next from "../../icon/next.svg";
-import camera from "../../icon/camera.svg";
-import back from "../../icon/back.svg";
 import {
   PageContext,
   ProgressContext,
   RecordContext,
 } from "../../context/MyContext";
-import backbtn from "../../icon/backbtn.svg";
-import voice from "../../icon/voice.svg";
-import compelete from "../../icon/compelete.svg";
+import ReactEcharts from "echarts-for-react";
+import echarts, { color } from "echarts";
 
+const option = {
+  color: ["rgba(255, 255, 255, 0.88)"],
+  radar: {
+    // shape: 'circle',
+    indicator: [
+      { name: "知觉域", max: 40 },
+      { name: "注意域", max: 40 },
+      { name: "记忆域", max: 40 },
+      { name: "思维域", max: 40 },
+      { name: "推理域", max: 40 },
+      { name: "判断域", max: 40 },
+    ],
+    splitNumber: 4,
+    radius: 70,
+    splitArea: {
+      areaStyle: {
+        color: [
+          "rgba(0, 0, 0, 0)",
+          "rgba(0, 0, 0, 0)",
+          "rgba(0, 0, 0, 0)",
+          "rgba(0, 0, 0, 0)",
+        ],
+        shadowColor: "rgba(0, 0, 0, 0.2)",
+        shadowBlur: 10,
+      },
+    },
+    axisLine: {
+      lineStyle: {
+        color: "rgba(255, 255, 255, 0.88)",
+      },
+    },
+    splitLine: {
+      lineStyle: {
+        type: ["solid", "solid", "dashed", "dashed"],
+        color: [
+          "rgb(255, 250, 254)",
+          "rgba(255, 255, 255, 0.91)",
+          "rgba(255, 255, 255, 0.86)",
+          "rgba(255, 255, 255, 0.86)",
+        ],
+      },
+    },
+    axisName: {
+      formatter: "{value}",
+      color: "rgb(255, 255, 255)",
+      fontWeight: "bold",
+      fontSize: 16,
+      padding: [5, 1, 5, 1],
+    },
+    nameGap: 2,
+  },
+  series: [
+    {
+      name: "Budget vs spending",
+      type: "radar",
+      data: [
+        {
+          value: [25, 25, 18, 25, 32, 25],
+          name: "Allocated Budget",
+          symbol: "none",
+          areaStyle: {
+            color: "rgba(215, 214, 231, 0.93)",
+          },
+        },
+      ],
+    },
+  ],
+};
 export const DataPage = (props: { pagenum: number }) => {
   const [page, setPage] = useState<number>(props.pagenum);
   switch (page) {
@@ -69,161 +133,14 @@ function Card({ children, isanimation = false }: CardProps) {
     </div>
   );
 }
-function Page1(props: { handlenext: () => void }) {
-  return (
-    <Card>
-      <div className={styles.title}>
-        今天的精彩瞬间
-        <br />
-        已经珍藏！
-      </div>
-      <div className={styles.cardtext}>
-        接下来，
-        <br />
-        让我们一起
-        <br /> 回味那些
-        <br /> 温馨记忆吧。
-      </div>
-      <img
-        className={styles.nextbtn}
-        onClick={() => props.handlenext()}
-        src={next}
-        alt=""
-      />
-    </Card>
-  );
-}
-
-function Page2(props: { handleback: () => void; handlenext: () => void }) {
-  const recordcontext = useContext(RecordContext);
-  return (
-    <Card>
-      <div className={styles.title}>
-        这是你昨天
-        <br />
-        记录的照片
-      </div>
-      <img
-        src={recordcontext[recordcontext.length - 1].img}
-        alt=""
-        className={styles.photo}
-      />
-      <img
-        className={styles.nextbtn}
-        src={next}
-        alt=""
-        onClick={() => props.handlenext()}
-      />
-    </Card>
-  );
-}
-
-function Page3(props: { handlenext: () => void; handleback: () => void }) {
-  const recordcontext = useContext(RecordContext);
-  return (
-    <Card>
-      <img
-        className={styles.smallphoto}
-        src={recordcontext[recordcontext.length - 1].img}
-        alt=""
-      ></img>
-      <div className={styles.cardtext}>
-        {recordcontext[recordcontext.length - 1].descriptions[0].question}
-      </div>
-      <img
-        className={styles.nextbtn}
-        src={next}
-        alt=""
-        onClick={() => props.handlenext()}
-      />
-    </Card>
-  );
-}
-
-function Page4(props: { handlenext: () => void }) {
-  const recordcontext = useContext(RecordContext);
-  const [value, setValue] = useState("");
-  const handleInputChange = (e: any) => {
-    setValue(e.target.value); // 更新 value 的状态
-    console.log(e.target.value); // 可选：控制台输出当前的输入值
-  };
-  const handleVoiceInput = () => {
-    //TODO 接麦克风和实时转写
-  };
-  const handleok = () => {
-    recordcontext[recordcontext.length - 1].descriptions.push({
-      question:
-        recordcontext[recordcontext.length - 1].descriptions[0].question,
-      answer: value,
-    });
-    props.handlenext();
-  };
-  return (
-    <Card>
-      <img
-        className={styles.smallphoto}
-        src={recordcontext[recordcontext.length - 1].img}
-        alt=""
-      ></img>
-      <div className={styles.inputcard}>
-        <textarea
-          name=""
-          id=""
-          value={value} // 确保将 value 设置为 textarea 的值
-          onChange={handleInputChange}
-        ></textarea>
-      </div>
-      <div className={styles.btngroup}>
-        <div className={styles.imgempty}></div>
-        <img src={voice} alt="" onClick={handleVoiceInput} />
-        <img className={styles.nextbtn} src={next} alt="" onClick={handleok} />
-      </div>
-    </Card>
-  );
-}
-
-function Page5(props: { handlenext: () => void }) {
-  const recordcontext = useContext(RecordContext);
-  const [value, setValue] = useState("");
-  const [question, setQuestion] = useState("");
-  const handleInputChange = (e: any) => {
-    setValue(e.target.value); // 更新 value 的状态
-    console.log(e.target.value); // 可选：控制台输出当前的输入值
-  };
-  const handleVoiceInput = () => {
-    //TODO 接麦克风和实时转写
-  };
-  const handleok = () => {
-    recordcontext[recordcontext.length - 1].descriptions.push({
-      question: question,
-      answer: value,
-    });
-    props.handlenext();
-  };
-  return (
-    <Card>
-      <div className={styles.title} style={{ height: 174 }}>
-        {question}
-      </div>
-      <div className={styles.inputcard}>
-        <textarea
-          name=""
-          id=""
-          value={value} // 确保将 value 设置为 textarea 的值
-          onChange={handleInputChange}
-        ></textarea>
-      </div>
-      <div className={styles.btngroup}>
-        <div className={styles.imgempty}></div>
-        <img src={voice} alt="" onClick={handleVoiceInput} />
-        <img className={styles.nextbtn} src={next} alt="" onClick={handleok} />
-      </div>
-    </Card>
-  );
-}
-
 function Page7(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      props.handlenext();
+    }, 2000);
+    return () => clearTimeout(timer);
+  });
   return (
     <Card>
       <div className={styles.title}>
@@ -231,7 +148,9 @@ function Page7(props: { handlenext: () => void }) {
         <br />
         训练成果吧
       </div>
-      <div className={styles.cardtext}>雷达图</div>
+      <div className={styles.cardtext}>
+        <ReactEcharts option={option}></ReactEcharts>
+      </div>
       <img
         className={styles.nextbtn}
         src={next}
@@ -246,7 +165,13 @@ function Page8(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
   const { pagenum, setPagenum } = useContext(PageContext);
   const { progress, setProgress } = useContext(ProgressContext);
-
+  const [animation, setAnimation] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimation(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  });
   useEffect(() => {
     const timer = setTimeout(() => {
       // setPagenum(0);
@@ -254,19 +179,18 @@ function Page8(props: { handlenext: () => void }) {
     }, 0);
     return () => clearTimeout(timer);
   });
-  useEffect(() => {
-    console.log(pagenum);
-  }, [pagenum]);
   return (
     <>
       <NextCard></NextCard>
-      <Card isanimation={true}>
+      <Card isanimation={animation}>
         <div className={styles.title}>
           看看你的
           <br />
           训练成果吧
         </div>
-        <div className={styles.cardtext}>雷达图</div>
+        <div className={styles.cardtext}>
+          <ReactEcharts option={option}></ReactEcharts>
+        </div>
         <img
           className={styles.nextbtn}
           src={next}

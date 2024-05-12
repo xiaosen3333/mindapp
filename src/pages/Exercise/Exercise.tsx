@@ -6,6 +6,7 @@ import next1 from "../../icon/next.svg";
 import { PageContext, ProgressContext } from "../../context/MyContext";
 import compelete from "../../icon/compelete.svg";
 import { random } from "lodash";
+import circleicon from "../../icon/circle.svg";
 export const ExercisePage = (props: { pagenum: number }) => {
   const [page, setPage] = useState<number>(props.pagenum);
   switch (page) {
@@ -129,37 +130,50 @@ function Page2(props: { handleback: () => void; handlenext: () => void }) {
     // 当时间到达0时，清除计时器
     if (timeLeft === 0) {
       clearInterval(timer);
+      setCircles([]);
+      props.handlenext();
     }
-
     // 组件卸载时清除计时器
     return () => clearInterval(timer);
   }, [timeLeft]); // 依赖项为timeLeft，当timeLeft变化时，effect会重新运行
 
+  useEffect(() => {
+    if (timeLeft % 2 === 0) {
+      console.log(timeLeft);
+      circles.push({
+        id: circles.length + 1,
+        x: random(0, 70),
+        y: random(0, 80),
+        opacity: 1,
+      });
+      const timer = setTimeout(() => {
+        circles[circles.length - 1].opacity = 0;
+      }, 2000);
+    }
+  }, [timeLeft]);
   return (
     <Card>
       <div className={styles.title}>
-        {timeLeft > 0 ? `00:${timeLeft}` : "时间到!"}
+        {timeLeft > 0
+          ? `00:${timeLeft.toString().padStart(2, "0")}`
+          : "时间到!"}
       </div>
-      <div
-        style={{
-          position: "relative",
-          width: "80%",
-          height: "300px", // 设置一个区域的高度
-          border: "1px solid black",
-        }}
-      >
+      <div className={styles.fingercard}>
         {circles.map((circle) => (
-          <div
+          <img
+            className={styles.circle}
+            src={circleicon}
+            alt=""
             key={circle.id}
             style={{
               position: "absolute",
               left: `${circle.x}%`,
               top: `${circle.y}%`,
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
-              backgroundColor: "blue",
               opacity: circle.opacity,
+            }}
+            onClick={() => {
+              circle.opacity = 0;
+              setCircles([...circles]);
             }}
           />
         ))}

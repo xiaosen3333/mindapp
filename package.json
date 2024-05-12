@@ -10,6 +10,8 @@
     "antd": "^5.17.0",
     "base-64": "^1.0.0",
     "crypto-js": "^4.2.0",
+    "echarts": "^5.5.0",
+    "echarts-for-react": "^3.0.2",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-mic": "^12.4.6",
