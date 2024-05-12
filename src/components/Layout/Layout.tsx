@@ -14,7 +14,7 @@ const { Header, Content, Footer } = Layout;
 
 export const MyLayout: React.FC = () => {
   const [progress, setProgress] = useState(0);
-  const [pagenum, setPagenum] = useState(3);
+  const [pagenum, setPagenum] = useState(0);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
