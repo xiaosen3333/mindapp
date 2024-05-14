@@ -11,7 +11,7 @@ import { DataPage } from "../../pages/Data/Data";
 import Dictaphone from "../Speech";
 const { Header, Content, Footer } = Layout;
 
-export const MyLayout: React.FC = () => {
+export function MyLayout(props: { changemode: () => void }) {
   const [progress, setProgress] = useState(0);
   const [pagenum, setPagenum] = useState(0);
   useEffect(() => {
@@ -34,7 +34,7 @@ export const MyLayout: React.FC = () => {
         }}
       >
         <img src={menu} alt=""></img>
-        <img src={user} alt=""></img>
+        <img src={user} onClick={() => props.changemode()} alt=""></img>
       </Header>
       <PageContext.Provider value={{ pagenum, setPagenum }}>
         <ProgressContext.Provider value={{ progress, setProgress }}>
@@ -64,4 +64,4 @@ export const MyLayout: React.FC = () => {
       </Footer>
     </Layout>
   );
-};
+}

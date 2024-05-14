@@ -6,6 +6,7 @@ import next from "../../icon/next.svg";
 import camera from "../../icon/camera.svg";
 import back from "../../icon/back.svg";
 import {
+  DailyRecordContext,
   PageContext,
   ProgressContext,
   RecordContext,
@@ -233,6 +234,7 @@ function Page5(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
   const [tempValue, setTempValue] = useState("");
   const [value, setValue] = useState("");
+  const dailyrecordcontext = useContext(DailyRecordContext);
   const { transcript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
   const handleInputChange = (e: any) => {
@@ -277,6 +279,18 @@ function Page5(props: { handlenext: () => void }) {
     return <span>Browser doesn't support speech recognition.</span>;
   }
   async function handleok() {
+    recordcontext[recordcontext.length - 1].summarize = value;
+    const date = new Date();
+    recordcontext[recordcontext.length - 1].date = `${
+      date.getMonth() + 1
+    }月${date.getDate()}日 ${date.getHours()}:${date.getMinutes()}`;
+    console.log(recordcontext[recordcontext.length - 1].date);
+    dailyrecordcontext[dailyrecordcontext.length - 1].card2.date =
+      recordcontext[recordcontext.length - 1].date;
+    dailyrecordcontext[dailyrecordcontext.length - 1].card2.summarize =
+      recordcontext[recordcontext.length - 1].summarize;
+    dailyrecordcontext[dailyrecordcontext.length - 1].card2.img =
+      recordcontext[recordcontext.length - 1].img;
     submit();
   }
   return (

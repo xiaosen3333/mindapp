@@ -3,6 +3,7 @@ import { useRef } from "react";
 import styles from "./Question.module.scss";
 import next from "../../icon/next.svg";
 import {
+  DailyRecordContext,
   PageContext,
   ProgressContext,
   RecordContext,
@@ -385,6 +386,19 @@ function Page5(props: { handlenext: () => void }) {
 
 function Page7(props: { handlenext: () => void }) {
   const recordcontext = useContext(RecordContext);
+  const dailyrecordcontext = useContext(DailyRecordContext);
+  useEffect(() => {
+    const date = new Date();
+    const formatedate = `${
+      date.getMonth() + 1
+    }月${date.getDate()}日 ${date.getHours()}:${date.getMinutes()}`;
+    dailyrecordcontext[dailyrecordcontext.length - 1].card3 = {
+      img: recordcontext[recordcontext.length - 1].img,
+      summarize: recordcontext[recordcontext.length - 1].descriptions[0].answer,
+      date: formatedate,
+    };
+    console.log(dailyrecordcontext);
+  });
   return (
     <Card>
       <div className={styles.title}>
